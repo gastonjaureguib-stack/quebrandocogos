@@ -1,13 +1,13 @@
-// panel.js – versión final lista para módulo y Supabase
+// panel.js – versión final adaptada para GitHub Pages y módulos
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js"; // ajustá la ruta si es necesario
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Usuario
 const usuario = localStorage.getItem("usuario");
 if (!usuario) {
-    window.location.href = "index.html";
+    window.location.href = "../index.html"; // GitHub Pages y Live Server
 }
 
 document.getElementById("bienvenida").textContent = "Bienvenido " + usuario;
@@ -29,7 +29,7 @@ async function mostrarReservas() {
 
     reservas.forEach(r => {
         const li = document.createElement("li");
-        li.textContent = `${r.dosis} - ${r.horario}`;
+        li.textContent = `${r.dosis} - ${r.horarios}`; // cambio horario → horarios
         lista.appendChild(li);
     });
 }
@@ -37,7 +37,6 @@ async function mostrarReservas() {
 // Función para cargar horarios disponibles
 async function cargarHorarios() {
     const select = document.getElementById("horario");
-
     const horarios = ["12:00","13:00","14:00","15:00","16:00","17:00","18:00"];
 
     const { data: reservas, error } = await supabase.from("reservas").select("*");
@@ -50,7 +49,7 @@ async function cargarHorarios() {
     select.innerHTML = "";
 
     horarios.forEach(horario => {
-        const reservasEnHorario = reservas.filter(r => r.horario === horario);
+        const reservasEnHorario = reservas.filter(r => r.horarios === horario); // horario → horarios
         const lugaresDisponibles = 4 - reservasEnHorario.length;
 
         const option = document.createElement("option");
@@ -72,10 +71,11 @@ async function reservar() {
     const dosis = document.getElementById("dosis").value;
     const horario = document.getElementById("horario").value;
 
+    // Verificar cupo
     const { data: reservas, error } = await supabase
         .from("reservas")
         .select("*")
-        .eq("horario", horario);
+        .eq("horarios", horario); // cambio horario → horarios
 
     if (error) {
         console.error(error);
@@ -87,9 +87,10 @@ async function reservar() {
         return;
     }
 
+    // Insertar reserva
     const { data, error: insertError } = await supabase
         .from("reservas")
-        .insert([{ usuario, dosis, horario }]);
+        .insert([{ usuario, dosis, horarios: horario }]); // cambio horario → horarios
 
     if (insertError) {
         console.error(insertError);
@@ -99,8 +100,8 @@ async function reservar() {
 
     alert("Reserva realizada con éxito");
 
-    cargarHorarios();
-    mostrarReservas();
+    await cargarHorarios(); // recargar horarios
+    await mostrarReservas(); // mostrar reservas actualizadas
 }
 
 // Funciones de contraseña y sesión
@@ -117,9 +118,7 @@ function cerrarSesion() {
 cargarHorarios();
 mostrarReservas();
 
-// Exponer funciones al HTML
-window.reservar = reservar;
-window.cargarHorarios = cargarHorarios;
-window.mostrarReservas = mostrarReservas;
-window.cambiarPassword = cambiarPassword;
-window.cerrarSesion = cerrarSesion;
+// 🔹 Vincular botones con addEventListener (GitHub Pages friendly)
+document.getElementById("btnReservar").addEventListener("click", reservar);
+document.getElementById("btnCambiarPassword").addEventListener("click", cambiarPassword);
+document.getElementById("btnCerrarSesion").addEventListener("click", cerrarSesion);
