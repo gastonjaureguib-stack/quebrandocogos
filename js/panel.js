@@ -16,59 +16,83 @@ function reservar(){
 const dosis = document.getElementById("dosis").value
 const horario = document.getElementById("horario").value
 
+let reservas = JSON.parse(localStorage.getItem("reservas")) || []
+
+const reservasEnHorario = reservas.filter(r => r.horario === horario)
+
+if(reservasEnHorario.length >= 4){
+
+alert("Este horario está completo. Elegí otro.")
+
+return
+
+}
+
 const nuevaReserva = {
-usuario: usuario,
+
+usuario: localStorage.getItem("usuario"),
 dosis: dosis,
 horario: horario
+
 }
 
 reservas.push(nuevaReserva)
 
 localStorage.setItem("reservas", JSON.stringify(reservas))
 
+alert("Reserva realizada con éxito")
+
 mostrarReservas()
+
+cargarHorarios()
 
 }
 
 
-function mostrarReservas(){
+function cargarHorarios(){
 
-const lista = document.getElementById("listaReservas")
+const select = document.getElementById("horario")
 
-lista.innerHTML = ""
+let reservas = JSON.parse(localStorage.getItem("reservas")) || []
 
-reservas
-.filter(r => r.usuario === usuario)
-.forEach(reserva => {
+const horarios = [
+"12:00",
+"13:00",
+"14:00",
+"15:00",
+"16:00",
+"17:00",
+"18:00"
+]
 
-const li = document.createElement("li")
+select.innerHTML = ""
 
-li.textContent = reserva.dosis + " - retiro a las " + reserva.horario
+horarios.forEach(horario => {
 
-lista.appendChild(li)
+const reservasEnHorario = reservas.filter(r => r.horario === horario)
+
+const lugaresDisponibles = 4 - reservasEnHorario.length
+
+const option = document.createElement("option")
+
+option.value = horario
+
+if(lugaresDisponibles <= 0){
+
+option.textContent = `${horario} (completo)`
+option.disabled = true
+
+}else{
+
+option.textContent = `${horario} (${lugaresDisponibles} lugares)`
+
+}
+
+select.appendChild(option)
 
 })
 
 }
 
-
-function cambiarPassword(){
-
-const nueva = document.getElementById("nuevaPassword").value
-
-alert("Contraseña cambiada (demo)")
-
-}
-
-
-function cerrarSesion(){
-
-localStorage.removeItem("usuario")
-
-window.location.href = "../index.html"
-
-}
-
-
+cargarHorarios()
 mostrarReservas()
-
