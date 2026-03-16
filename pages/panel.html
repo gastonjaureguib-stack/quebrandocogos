@@ -1,71 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del Socio</title>
-  <link rel="stylesheet" href="../css/panel.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Usuario</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
-
-  <div class="panel">
-
-    <header class="header">
-      <h1>Panel del socio</h1>
-      <p id="bienvenida"></p>
+    <header>
+        <h1 id="bienvenida">Bienvenido</h1>
+        <button id="logout">Cerrar sesión</button>
     </header>
 
-    <div class="grid">
+    <main>
+        <h2>Reservas</h2>
+        <form id="form-reserva">
+            <label for="dosis">Dosis:</label>
+            <input type="text" id="dosis" required>
 
-      <div class="card">
-        <h2>Reservar retiro</h2>
+            <label for="horario">Horario:</label>
+            <input type="time" id="horario" required>
 
-        <label>Dosis</label>
-        <select id="dosis">
-          <option value="5g">5g</option>
-          <option value="10g">10g</option>
-          <option value="20g">20g</option>
-        </select>
+            <button type="submit">Reservar</button>
+        </form>
 
-        <label>Horario</label>
-        <select id="horario">
-          <option value="12:00">12:00</option>
-          <option value="13:00">13:00</option>
-          <option value="14:00">14:00</option>
-          <option value="15:00">15:00</option>
-          <option value="16:00">16:00</option>
-          <option value="17:00">17:00</option>
-          <option value="18:00">18:00</option>
-        </select>
+        <section id="lista-reservas">
+            <h3>Mis Reservas</h3>
+            <ul id="reservas-ul"></ul>
+        </section>
+    </main>
 
-        <!-- Botón con ID para usar addEventListener -->
-        <button id="btnReservar">Reservar</button>
-      </div>
-
-      <div class="card">
-        <h2>Mis reservas</h2>
-        <ul id="listaReservas"></ul>
-      </div>
-
-      <div class="card">
-        <h2>Cambiar contraseña</h2>
-        <input type="password" id="nuevaPassword" placeholder="Nueva contraseña">
-        <button id="btnCambiarPassword">Cambiar contraseña</button>
-      </div>
-
-      <div class="card">
-        <h2>Sesión</h2>
-        <button id="btnCerrarSesion">Cerrar sesión</button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Script tipo módulo, rutas absolutas para GitHub Pages -->
- <script type="module" src="/quebrandocogos/js/panel.js"></script>
-
+    <script type="module" src="js/panel.js"></script>
 </body>
-
 </html>
