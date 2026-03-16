@@ -1,169 +1,232 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial, Helvetica, sans-serif;
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', Helvetica, sans-serif;
 }
 
-
-body{
-background:#0f0f0f;
-color:white;
-padding:30px;
+body {
+    background: #0f0f0f;
+    color: #ffffff;
+    padding: 30px;
+    line-height: 1.5;
 }
 
-
-/* HEADER */
-
-.header{
-text-align:center;
-margin-bottom:30px;
+/* Header */
+header, .header {
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-#bienvenida{
-opacity:0.8;
-margin-top:5px;
+#bienvenida {
+    opacity: 0.85;
+    margin-top: 5px;
+    font-size: 1.2rem;
+    font-weight: 500;
 }
 
-
-/* GRID PRINCIPAL */
-
-.grid{
-
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:25px;
-
-max-width:900px;
-margin:auto;
-
+/* Botones generales */
+button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 8px;
+    background: #2e7d32;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.2s ease;
 }
 
-
-/* TARJETAS */
-
-.card{
-
-background:#1a1a1a;
-padding:25px;
-border-radius:10px;
-box-shadow:0 0 15px rgba(0,0,0,0.4);
-
-display:flex;
-flex-direction:column;
-
+button:hover {
+    background: #1b5e20;
+    transform: translateY(-2px);
 }
 
-
-h2{
-margin-bottom:15px;
-color:#6eff6e;
+/* Botones en header */
+header button, .header button {
+    margin: 5px;
 }
 
-
-/* INPUTS */
-
-label{
-margin-top:10px;
-margin-bottom:5px;
+/* Formulario */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 420px;
+    margin: 0 auto 25px auto;
+    background: #1a1a1a;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
-select,
-input{
-
-padding:10px;
-border:none;
-border-radius:5px;
-background:#2a2a2a;
-color:white;
-
-margin-bottom:10px;
-
+input, select {
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #2a2a2a;
+    color: white;
+    font-size: 0.95rem;
 }
 
-
-/* BOTONES */
-
-button{
-
-margin-top:10px;
-padding:12px;
-
-border:none;
-border-radius:6px;
-
-background:#2e7d32;
-color:white;
-font-weight:bold;
-
-cursor:pointer;
-
-transition:0.2s;
-
+label {
+    font-size: 0.95rem;
+    margin-bottom: 5px;
 }
 
-button:hover{
-
-background:#1b5e20;
-
+/* Grid para tarjetas */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    max-width: 950px;
+    margin: auto;
 }
 
-
-/* RESERVAS */
-
-ul{
-
-list-style:none;
-margin-top:10px;
-
+/* Tarjetas */
+.card {
+    background: #1a1a1a;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
-li{
-
-background:#2a2a2a;
-padding:10px;
-border-radius:6px;
-margin-bottom:5px;
-
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 35px rgba(0, 128, 0, 0.6);
 }
 
-
-/* RESPONSIVE MOBILE */
-
-@media (max-width:700px){
-
-.grid{
-
-grid-template-columns:1fr;
-
+/* Títulos */
+h2 {
+    margin-bottom: 18px;
+    color: #6eff6e;
 }
 
-body{
-
-padding:15px;
-
+/* Lista de reservas como tarjetas */
+#lista-reservas ul {
+    list-style: none;
+    margin-top: 15px;
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
+#lista-reservas li {
+    background: #2a2a2a;
+    padding: 16px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-table{
-
-width:100%;
-border-collapse:collapse;
-margin-top:15px;
-
+#lista-reservas li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 255, 0, 0.5);
 }
 
-th, td{
-
-padding:10px;
-text-align:left;
-border-bottom:1px solid #333;
-
+#lista-reservas li span {
+    flex: 1;
 }
 
-th{
+/* Botones dentro de las tarjetas */
+#lista-reservas li button {
+    margin-left: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
 
-color:#6eff6e;
+#lista-reservas li button:hover {
+    transform: scale(1.05);
+}
 
+#lista-reservas li button.edit {
+    background: #f57f17;
+    color: #fff;
+}
+
+#lista-reservas li button.delete {
+    background: #b71c1c;
+    color: #fff;
+}
+
+/* Tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+    font-size: 0.95rem;
+}
+
+th {
+    color: #6eff6e;
+}
+
+/* Modal de confirmación */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1a1a1a;
+    padding: 25px 35px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0,128,0,0.5);
+    color: #6eff6e;
+    font-size: 1.1rem;
+}
+
+.modal-content button {
+    margin-top: 15px;
+    background: #2e7d32;
+    padding: 10px 20px;
+}
+
+.modal-content button:hover {
+    background: #1b5e20;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    body {
+        padding: 15px;
+    }
+    form {
+        width: 100%;
+        padding: 20px;
+    }
+    li {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
 }
