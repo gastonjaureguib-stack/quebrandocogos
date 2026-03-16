@@ -1,28 +1,25 @@
-// panel.js con Supabase
+// panel.js – versión final lista para módulo y Supabase
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-// ⚠️ Reemplazá estos datos con tu info real de Supabase en un archivo seguro
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Usuario
 const usuario = localStorage.getItem("usuario");
-if(!usuario){
+if (!usuario) {
     window.location.href = "index.html";
 }
 
 document.getElementById("bienvenida").textContent = "Bienvenido " + usuario;
 
 // Función para mostrar reservas
-async function mostrarReservas(){
+async function mostrarReservas() {
     const { data: reservas, error } = await supabase
         .from("reservas")
         .select("*")
         .eq("usuario", usuario);
 
-    if(error){
+    if (error) {
         console.error(error);
         return;
     }
@@ -38,18 +35,14 @@ async function mostrarReservas(){
 }
 
 // Función para cargar horarios disponibles
-async function cargarHorarios(){
+async function cargarHorarios() {
     const select = document.getElementById("horario");
 
-    // Todos los horarios posibles
     const horarios = ["12:00","13:00","14:00","15:00","16:00","17:00","18:00"];
 
-    // Traer reservas desde Supabase
-    const { data: reservas, error } = await supabase
-        .from("reservas")
-        .select("*");
+    const { data: reservas, error } = await supabase.from("reservas").select("*");
 
-    if(error){
+    if (error) {
         console.error(error);
         return;
     }
@@ -63,7 +56,7 @@ async function cargarHorarios(){
         const option = document.createElement("option");
         option.value = horario;
 
-        if(lugaresDisponibles <= 0){
+        if (lugaresDisponibles <= 0) {
             option.textContent = `${horario} (completo)`;
             option.disabled = true;
         } else {
@@ -75,32 +68,30 @@ async function cargarHorarios(){
 }
 
 // Función para reservar
-async function reservar(){
+async function reservar() {
     const dosis = document.getElementById("dosis").value;
     const horario = document.getElementById("horario").value;
 
-    // Traer reservas actuales
     const { data: reservas, error } = await supabase
         .from("reservas")
         .select("*")
         .eq("horario", horario);
 
-    if(error){
+    if (error) {
         console.error(error);
         return;
     }
 
-    if(reservas.length >= 4){
+    if (reservas.length >= 4) {
         alert("Este horario está completo. Elegí otro.");
         return;
     }
 
-    // Insertar reserva
     const { data, error: insertError } = await supabase
         .from("reservas")
         .insert([{ usuario, dosis, horario }]);
 
-    if(insertError){
+    if (insertError) {
         console.error(insertError);
         alert("Ocurrió un error al guardar la reserva.");
         return;
@@ -112,16 +103,23 @@ async function reservar(){
     mostrarReservas();
 }
 
-// Funciones de contraseña y sesión (pueden quedarse como antes o adaptarse a Supabase auth)
-function cambiarPassword(){
+// Funciones de contraseña y sesión
+function cambiarPassword() {
     alert("Función de cambiar contraseña aún no integrada con Supabase Auth.");
 }
 
-function cerrarSesion(){
+function cerrarSesion() {
     localStorage.removeItem("usuario");
-    window.location.href = "index.html";
+    window.location.href = "../index.html";
 }
 
 // Inicialización
 cargarHorarios();
 mostrarReservas();
+
+// Exponer funciones al HTML
+window.reservar = reservar;
+window.cargarHorarios = cargarHorarios;
+window.mostrarReservas = mostrarReservas;
+window.cambiarPassword = cambiarPassword;
+window.cerrarSesion = cerrarSesion;
