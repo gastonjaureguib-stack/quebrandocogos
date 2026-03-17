@@ -1,13 +1,24 @@
-let reservas = JSON.parse(localStorage.getItem("reservas")) || []
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js'
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 const tbody = document.querySelector("#tablaReservas tbody")
 
-
-function mostrarReservas(){
+async function mostrarReservas(){
 
 tbody.innerHTML = ""
 
-reservas.forEach((reserva, index) => {
+try{
+
+const { data, error } = await supabase
+.from('reservas')
+.select('*')
+.order('horario', { ascending: true })
+
+if(error) throw error
+
+data.forEach((reserva) => {
 
 const fila = document.createElement("tr")
 
@@ -16,7 +27,11 @@ fila.innerHTML = `
 <td>${reserva.usuario}</td>
 <td>${reserva.dosis}</td>
 <td>${reserva.horario}</td>
-<td><button onclick="eliminarReserva(${index})">Eliminar</button></td>
+<td>
+<button onclick="eliminarReserva('${reserva.id}')">
+Eliminar
+</button>
+</td>
 
 `
 
@@ -24,16 +39,35 @@ tbody.appendChild(fila)
 
 })
 
+}catch(err){
+
+console.error("Error cargando reservas:", err)
+
+}
+
 }
 
 
-function eliminarReserva(index){
+async function eliminarReserva(id){
 
-reservas.splice(index,1)
+if(!confirm("¿Eliminar esta reserva?")) return
 
-localStorage.setItem("reservas", JSON.stringify(reservas))
+try{
+
+const { error } = await supabase
+.from('reservas')
+.delete()
+.eq('id', id)
+
+if(error) throw error
 
 mostrarReservas()
+
+}catch(err){
+
+console.error("Error eliminando reserva:", err)
+
+}
 
 }
 
@@ -47,5 +81,7 @@ window.location.href = "../index.html"
 
 }
 
+window.eliminarReserva = eliminarReserva
+window.cerrarSesion = cerrarSesion
 
 mostrarReservas()
