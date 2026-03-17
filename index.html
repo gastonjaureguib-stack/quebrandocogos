@@ -39,14 +39,48 @@ required
 
 </form>
 
+<!-- BOTÓN INSTALAR APP -->
+<button id="btnInstalar" style="display:none; margin-top:15px;">
+Descargar app
+</button>
+
 </div>
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
+ navigator.serviceWorker.register('/quebrandocogos/service-worker.js')
     .then(() => console.log("Service Worker registrado"))
     .catch(err => console.log("Error:", err));
 }
+
+
+
+// ===== INSTALAR APP =====
+let deferredPrompt;
+const btnInstalar = document.getElementById("btnInstalar");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  btnInstalar.style.display = "block";
+});
+
+btnInstalar.addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+
+  const { outcome } = await deferredPrompt.userChoice;
+
+  if (outcome === "accepted") {
+    console.log("App instalada");
+  } else {
+    console.log("Instalación cancelada");
+  }
+
+  deferredPrompt = null;
+  btnInstalar.style.display = "none";
+});
 </script>
 
 <script type="module" src="js/login.js"></script>
