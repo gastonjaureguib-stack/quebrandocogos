@@ -27,6 +27,7 @@ fila.innerHTML = `
 <td>${reserva.usuario}</td>
 <td>${reserva.dosis}</td>
 <td>${reserva.horario}</td>
+<td>${reserva.variedad}</td>
 <td>
 <button onclick="eliminarReserva('${reserva.id}')">
 Eliminar

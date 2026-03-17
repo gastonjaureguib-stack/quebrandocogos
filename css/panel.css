@@ -168,11 +168,18 @@ table {
     margin-top: 15px;
 }
 
+/* 🔧 CORRECCIÓN APLICADA AQUÍ */
 th, td {
     padding: 12px;
-    text-align: left;
+    text-align: center;
+    vertical-align: middle;
     border-bottom: 1px solid #333;
     font-size: 0.95rem;
+}
+
+/* 🔧 CORRECCIÓN APLICADA AQUÍ */
+td button {
+    display: inline-block;
 }
 
 th {

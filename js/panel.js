@@ -35,7 +35,7 @@ window.addEventListener('click', e => {
 })
 
 // Opciones
-const variedades = ['Lalona Kush', 'DiegoArmateUno']
+const variedades = ['Variedad Kush', 'Variedad Haze']
 const cantidades = [5, 10, 15, 20]
 const horarios = ['12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00']
 
