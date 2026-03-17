@@ -1,33 +1,49 @@
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config-public.js'
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
 const formulario = document.getElementById("loginForm")
 
-formulario.addEventListener("submit", function(e){
+formulario.addEventListener("submit", async function(e){
 
 e.preventDefault()
 
 const usuarioIngresado = document.getElementById("usuario").value
 const passwordIngresado = document.getElementById("password").value
 
+try{
 
-const usuarioValido = usuarios.find(user =>
+const { data, error } = await supabase
+.from("usuarios")
+.select("*")
+.eq("usuario", usuarioIngresado)
+.eq("password", passwordIngresado)
+.single()
 
-user.usuario === usuarioIngresado &&
-user.password === passwordIngresado
+if(error || !data){
 
-)
+alert("Usuario o contraseña incorrectos")
+return
 
+}
 
-if(usuarioValido){
+// guardar sesión
+localStorage.setItem("usuario", data.usuario)
+localStorage.setItem("rol", data.rol)
 
-localStorage.setItem("usuario", usuarioValido.usuario)
-localStorage.setItem("rol", usuarioValido.rol)
+console.log("Login correcto:", data)
 
-if(usuarioValido.cambiarPassword){
+// verificar si debe cambiar contraseña
+if(data.cambiar_password){
 
 window.location.href = "pages/cambiarclave.html"
+return
 
-}else{
+}
 
-if(usuarioValido.rol === "admin"){
+// redirección según rol
+if(data.rol === "admin"){
 
 window.location.href = "pages/admin.html"
 
@@ -37,11 +53,10 @@ window.location.href = "pages/panel.html"
 
 }
 
-}
+}catch(err){
 
-}else{
-
-alert("Usuario o contraseña incorrectos")
+console.error("Error en login:", err)
+alert("Error al iniciar sesión")
 
 }
 

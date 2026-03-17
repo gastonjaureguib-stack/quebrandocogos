@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
@@ -14,26 +15,46 @@
 
 <body>
 
-<div class="card" style="max-width:400px;margin:auto;margin-top:100px;">
+<div class="panel">
 
-<h2>Cambiar contraseña</h2>
+<header class="header">
+<h1>Cambiar contraseña</h1>
+<p>Por seguridad debes crear una nueva contraseña</p>
+</header>
 
-<p>Por seguridad debes crear una nueva contraseña.</p>
+<div class="card">
 
+<form id="formCambiarClave">
+
+<label>Nueva contraseña</label>
 <input
 type="password"
 id="nuevaPassword"
 placeholder="Nueva contraseña"
+required
+
 >
 
-<button onclick="guardarPassword()">
-Guardar contraseña
+<label>Confirmar contraseña</label>
+<input
+type="password"
+id="confirmarPassword"
+placeholder="Confirmar contraseña"
+required
+
+>
+
+<button type="submit">
+Guardar nueva contraseña
 </button>
+
+</form>
 
 </div>
 
-<script src="../js/usuarios.js"></script>
-<script src="../js/cambiarclave.js"></script>
+</div>
+
+<script type="module" src="../js/cambiarclave.js"></script>
 
 </body>
 
