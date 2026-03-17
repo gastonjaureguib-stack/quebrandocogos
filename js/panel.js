@@ -1,5 +1,4 @@
-// panel.js listo para GitHub Pages
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config-public.js' // Public config
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js'
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -15,8 +14,21 @@ document.getElementById('logout').addEventListener('click', () => {
     localStorage.removeItem('rol')
     window.location.href = '../index.html'
 })
+
 document.getElementById('cambiar-pass')?.addEventListener('click', () => {
     window.location.href = 'cambiarclave.html'
+})
+
+// Modal (USAMOS EL DEL HTML)
+const modal = document.getElementById('modal-reserva')
+const cerrarModal = document.getElementById('cerrar-modal')
+
+cerrarModal.addEventListener('click', () => {
+    modal.style.display = 'none'
+})
+
+window.addEventListener('click', e => {
+    if (e.target === modal) modal.style.display = 'none'
 })
 
 // Opciones
@@ -35,167 +47,182 @@ cantidades.forEach(c => selectCantidad.appendChild(new Option(c, c)))
 horarios.forEach(h => selectHorario.appendChild(new Option(h, h)))
 
 // Carrito temporal
-let carrito = []
-let editarId = null
+let carritoTemporal = {}
 
-// Actualizar lista de carrito
-function actualizarLista() {
-    ulReservas.innerHTML = ''
-    carrito.forEach(r => {
-        const li = document.createElement('li')
-        li.textContent = `Variedad: ${r.variedad || '-'}, Dosis: ${r.dosis || '-'}g, Horario: ${r.horario || '-'}`
-        ulReservas.appendChild(li)
-    })
+// Crear carrito visual
+const carritoVisual = document.createElement('div')
+carritoVisual.id = 'carrito-visual'
+carritoVisual.style.cssText = `
+max-width:420px;
+margin:20px auto;
+background:#1a1a1a;
+padding:20px;
+border-radius:12px;
+box-shadow:0 0 20px rgba(0,128,0,0.4);
+color:#6eff6e;
+font-size:0.95rem;
+`
+
+ulReservas.parentNode.insertBefore(carritoVisual, ulReservas)
+
+// Verificar cupos
+async function verificarCupos(horario){
+
+const { data, error } = await supabase
+.from('reservas')
+.select('*')
+.eq('horario', horario)
+
+if(error) throw error
+
+return data.length
+}
+
+// Guardar reserva
+document.getElementById('form-reserva').addEventListener('submit', async e => {
+
+e.preventDefault()
+
+if(!carritoTemporal.variedad || !carritoTemporal.dosis || !carritoTemporal.horario){
+alert('Completa todos los campos antes de reservar')
+return
+}
+
+try{
+
+// verificar si ya tiene reserva
+const { data: reservasUsuario } = await supabase
+.from('reservas')
+.select('*')
+.eq('usuario', usuario)
+
+if(reservasUsuario.length > 0){
+alert('Ya tienes una reserva activa. Cancélala primero.')
+return
+}
+
+const cupos = await verificarCupos(carritoTemporal.horario)
+
+if(cupos >= 4){
+alert('Horario completo')
+return
+}
+
+const { error } = await supabase
+.from('reservas')
+.insert([{ usuario, ...carritoTemporal }])
+
+if(error) throw error
+
+// limpiar formulario
+carritoTemporal = {}
+
+selectVariedad.value = ''
+selectCantidad.value = ''
+selectHorario.value = ''
+
+modal.style.display = 'flex'
+
+// volver a cargar reserva
+cargarReservaUsuario()
+
+}catch(err){
+
+console.error(err)
+alert('Error al guardar la reserva')
+
+}
+
+})
+
+// Mostrar reserva en carrito
+async function cargarReservaUsuario(){
+
+try{
+
+const { data, error } = await supabase
+.from('reservas')
+.select('*')
+.eq('usuario', usuario)
+
+if(error) throw error
+
+ulReservas.innerHTML = ''
+
+if(data.length === 0){
+
+carritoVisual.innerHTML = `
+<strong>Mis reservas</strong><br><br>
+No tienes reservas activas
+`
+
+return
+}
+
+const r = data[0]
+
+carritoVisual.innerHTML = `
+<strong>Tu reserva activa</strong><br><br>
+
+Variedad: ${r.variedad}<br>
+Dosis: ${r.dosis}g<br>
+Horario: ${r.horario}<br><br>
+
+<button id="cancelar-reserva" style="
+background:#b71c1c;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+">Cancelar reserva</button>
+`
+
+document.getElementById('cancelar-reserva').addEventListener('click', async ()=>{
+
+if(confirm('¿Cancelar tu reserva?')){
+
+const { error } = await supabase
+.from('reservas')
+.delete()
+.eq('id', r.id)
+
+if(error){
+alert('Error al cancelar')
+}else{
+cargarReservaUsuario()
+}
+
+}
+
+})
+
+// también mostrar en lista
+const li = document.createElement('li')
+li.textContent = `Variedad: ${r.variedad} - ${r.dosis}g - ${r.horario}`
+ulReservas.appendChild(li)
+
+}catch(err){
+
+console.error(err)
+
+}
+
 }
 
 // Eventos selects
-selectVariedad.addEventListener('change', () => {
-    carrito[0] = carrito[0] || {}
-    carrito[0].variedad = selectVariedad.value
-    actualizarLista()
-})
-selectCantidad.addEventListener('change', () => {
-    carrito[0] = carrito[0] || {}
-    carrito[0].dosis = selectCantidad.value
-    actualizarLista()
-})
-selectHorario.addEventListener('change', () => {
-    carrito[0] = carrito[0] || {}
-    carrito[0].horario = selectHorario.value
-    actualizarLista()
+selectVariedad.addEventListener('change', ()=>{
+carritoTemporal.variedad = selectVariedad.value
 })
 
-// Modal de confirmación
-const modal = document.createElement('div')
-modal.id = 'modal-reserva'
-modal.classList.add('modal')
-modal.innerHTML = `
-    <div class="modal-content">
-        <p>¡Reserva realizada con éxito!</p>
-        <button id="cerrar-modal">Aceptar</button>
-    </div>
-`
-document.body.appendChild(modal)
-const cerrarModal = document.getElementById('cerrar-modal')
-cerrarModal.addEventListener('click', () => { modal.style.display = 'none' })
-window.addEventListener('click', e => { if(e.target === modal) modal.style.display = 'none' })
-
-// Verificar cupos
-async function verificarCupos(horario) {
-    const { data, error } = await supabase
-        .from('reservas')
-        .select('*')
-        .eq('horario', horario)
-    if (error) throw error
-    return data.length
-}
-
-// Enviar o actualizar reserva
-document.getElementById('form-reserva').addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const reserva = carrito[0]
-    if (!reserva?.variedad || !reserva?.dosis || !reserva?.horario) {
-        alert('Completa todos los campos antes de reservar')
-        return
-    }
-
-    try {
-        const cupos = await verificarCupos(reserva.horario)
-        if (!editarId && cupos >= 4) {
-            alert('Horario completo, elige otro')
-            return
-        }
-
-        if (editarId) {
-            // Actualizar
-            const { error } = await supabase
-                .from('reservas')
-                .update({ variedad: reserva.variedad, dosis: reserva.dosis, horario: reserva.horario })
-                .eq('id', editarId)
-            if (error) throw error
-            editarId = null
-        } else {
-            // Insertar nueva
-            const { error } = await supabase
-                .from('reservas')
-                .insert([{ usuario, ...reserva }])
-            if (error) throw error
-        }
-
-        carrito = []
-        selectVariedad.value = ''
-        selectCantidad.value = ''
-        selectHorario.value = ''
-        actualizarLista()
-
-        modal.style.display = 'flex' // Mostrar modal
-        cargarReservasUsuario()
-    } catch (err) {
-        console.error(err)
-        alert('Error al guardar la reserva')
-    }
+selectCantidad.addEventListener('change', ()=>{
+carritoTemporal.dosis = selectCantidad.value
 })
 
-// Cargar reservas con botones Editar/Eliminar
-async function cargarReservasUsuario() {
-    try {
-        const { data, error } = await supabase
-            .from('reservas')
-            .select('*')
-            .eq('usuario', usuario)
-        if (error) throw error
-
-        ulReservas.innerHTML = ''
-
-        data.forEach(r => {
-            const li = document.createElement('li')
-            li.classList.add('card')
-            li.style.display = 'flex'
-            li.style.justifyContent = 'space-between'
-            li.style.alignItems = 'center'
-
-            const span = document.createElement('span')
-            span.textContent = `Variedad: ${r.variedad}, Dosis: ${r.dosis}g, Horario: ${r.horario}`
-            li.appendChild(span)
-
-            // Botón eliminar
-            const btnEliminar = document.createElement('button')
-            btnEliminar.textContent = 'Eliminar'
-            btnEliminar.style.background = '#b71c1c'
-            btnEliminar.onclick = async () => {
-                if (confirm('¿Eliminar esta reserva?')) {
-                    const { error } = await supabase
-                        .from('reservas')
-                        .delete()
-                        .eq('id', r.id)
-                    if (error) alert('Error al eliminar')
-                    else cargarReservasUsuario()
-                }
-            }
-            li.appendChild(btnEliminar)
-
-            // Botón editar
-            const btnEditar = document.createElement('button')
-            btnEditar.textContent = 'Editar'
-            btnEditar.style.background = '#f57f17'
-            btnEditar.onclick = () => {
-                selectVariedad.value = r.variedad
-                selectCantidad.value = r.dosis
-                selectHorario.value = r.horario
-                carrito[0] = { ...r }
-                editarId = r.id
-                actualizarLista()
-            }
-            li.appendChild(btnEditar)
-
-            ulReservas.appendChild(li)
-        })
-
-    } catch (err) {
-        console.error(err)
-    }
-}
+selectHorario.addEventListener('change', ()=>{
+carritoTemporal.horario = selectHorario.value
+})
 
 // Inicializar
-cargarReservasUsuario()
-actualizarLista()
+cargarReservaUsuario()
