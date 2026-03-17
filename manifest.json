@@ -1,19 +1,19 @@
 {
-  "id": "/quebrandocogos/",
   "name": "Club Cannábico",
   "short_name": "Club",
-  "start_url": "/quebrandocogos/",
+  "start_url": "/index.html",
+  "id": "/index.html",
   "display": "standalone",
   "background_color": "#0f0f0f",
   "theme_color": "#2e7d32",
   "icons": [
     {
-      "src": "/quebrandocogos/img/logo-192.png",
+      "src": "/img/logochico.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/quebrandocogos/img/logo-512.png",
+      "src": "/img/logochico512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
