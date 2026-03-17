@@ -7,79 +7,68 @@ const tbody = document.querySelector("#tablaReservas tbody")
 
 async function mostrarReservas(){
 
-tbody.innerHTML = ""
+    tbody.innerHTML = ""
 
-try{
+    try{
 
-const { data, error } = await supabase
-.from('reservas')
-.select('*')
-.order('horario', { ascending: true })
+        const { data, error } = await supabase
+        .from('reservas')
+        .select('*')
+        .order('horario', { ascending: true })
 
-if(error) throw error
+        if(error) throw error
 
-data.forEach((reserva) => {
+        data.forEach((reserva) => {
 
-const fila = document.createElement("tr")
+            const fila = document.createElement("tr")
 
-fila.innerHTML = `
+            fila.innerHTML = `
+                <td data-label="Socio">${reserva.usuario}</td>
+                <td data-label="Dosis">${reserva.dosis}</td>
+                <td data-label="Horario">${reserva.horario}</td>
+                <td data-label="Variedad">${reserva.variedad}</td>
+                <td data-label="Acción">
+                    <button onclick="eliminarReserva('${reserva.id}')">
+                        Eliminar
+                    </button>
+                </td>
+            `
 
-<td>${reserva.usuario}</td>
-<td>${reserva.dosis}</td>
-<td>${reserva.horario}</td>
-<td>${reserva.variedad}</td>
-<td>
-<button onclick="eliminarReserva('${reserva.id}')">
-Eliminar
-</button>
-</td>
+            tbody.appendChild(fila)
 
-`
+        })
 
-tbody.appendChild(fila)
-
-})
-
-}catch(err){
-
-console.error("Error cargando reservas:", err)
+    }catch(err){
+        console.error("Error cargando reservas:", err)
+    }
 
 }
-
-}
-
 
 async function eliminarReserva(id){
 
-if(!confirm("¿Eliminar esta reserva?")) return
+    if(!confirm("¿Eliminar esta reserva?")) return
 
-try{
+    try{
 
-const { error } = await supabase
-.from('reservas')
-.delete()
-.eq('id', id)
+        const { error } = await supabase
+        .from('reservas')
+        .delete()
+        .eq('id', id)
 
-if(error) throw error
+        if(error) throw error
 
-mostrarReservas()
+        mostrarReservas()
 
-}catch(err){
-
-console.error("Error eliminando reserva:", err)
-
-}
+    }catch(err){
+        console.error("Error eliminando reserva:", err)
+    }
 
 }
-
 
 function cerrarSesion(){
-
-localStorage.removeItem("usuario")
-localStorage.removeItem("rol")
-
-window.location.href = "../index.html"
-
+    localStorage.removeItem("usuario")
+    localStorage.removeItem("rol")
+    window.location.href = "../index.html"
 }
 
 window.eliminarReserva = eliminarReserva
