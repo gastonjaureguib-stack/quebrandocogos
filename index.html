@@ -2,85 +2,102 @@
 <html lang="es">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Club Cannábico</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Club Cannábico</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2e7d32">
-<link rel="stylesheet" href="css/style.css">
-<link rel="icon" href="./img/favicon.png">
-
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2e7d32">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="./img/favicon.png">
 </head>
 
 <body>
 
-<div class="contenedor">
+  <div class="contenedor">
 
-<img src="img/logo.png" alt="Logo Club" class="logo">
+    <img src="img/logo.png" alt="Logo Club" class="logo">
 
-<form id="loginForm" class="login">
+    <form id="loginForm" class="login">
 
-<input 
-type="text" 
-id="usuario" 
-placeholder="Usuario"
-required
->
+      <input 
+        type="text" 
+        id="usuario" 
+        placeholder="Usuario"
+        required
+      >
 
-<input 
-type="password" 
-id="password" 
-placeholder="Contraseña"
-required
->
+      <input 
+        type="password" 
+        id="password" 
+        placeholder="Contraseña"
+        required
+      >
 
-<button type="submit">Ingresar</button>
+      <button type="submit">Ingresar</button>
 
-</form>
+    </form>
 
-<!-- BOTÓN INSTALAR APP -->
-<button id="btnInstalar" style="display:none; margin-top:15px;">
-Descargar app
-</button>
+    <!-- BOTÓN INSTALAR APP -->
+    <button id="btnInstalar" style="display:none; margin-top:15px;">
+      Descargar app
+    </button>
 
-</div>
+  </div>
 
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js')
-    .then(() => console.log("Service Worker registrado"))
-    .catch(err => console.log("Error:", err));
-}
+  <script>
+    // ===== SERVICE WORKER =====
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(() => console.log("Service Worker registrado"))
+        .catch(err => console.log("Error:", err));
+    }
 
-// ===== INSTALAR APP =====
-let deferredPrompt;
-const btnInstalar = document.getElementById("btnInstalar");
+    // ===== INSTALAR / DESCARGAR APP =====
+    const btnInstalar = document.getElementById("btnInstalar");
+    let deferredPrompt;
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  btnInstalar.style.display = "block";
-});
+    // Detectar iOS
+    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-btnInstalar.addEventListener("click", async () => {
-  if (!deferredPrompt) return;
+    // Mostrar botón en iOS siempre
+    if (isiOS) {
+      btnInstalar.style.display = "block";
+      btnInstalar.innerText = "Agregar a pantalla de inicio";
+    }
 
-  deferredPrompt.prompt();
+    // Escuchar beforeinstallprompt (Android)
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      btnInstalar.style.display = "block";
+      btnInstalar.innerText = "Descargar app";
+    });
 
-  const { outcome } = await deferredPrompt.userChoice;
+    // Click en el botón
+    btnInstalar.addEventListener("click", async () => {
+      if (isiOS) {
+        // iOS no soporta instalación automática
+        alert("Para instalar en iPhone: toca el botón Compartir → Agregar a pantalla de inicio.");
+        return;
+      }
 
-  if (outcome === "accepted") {
-    console.log("App instalada");
-  } else {
-    console.log("Instalación cancelada");
-  }
+      if (!deferredPrompt) return;
 
-  deferredPrompt = null;
-  btnInstalar.style.display = "none";
-});
-</script>
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        console.log("App instalada");
+      } else {
+        console.log("Instalación cancelada");
+      }
 
-<script type="module" src="js/login.js"></script>
+      deferredPrompt = null;
+      btnInstalar.style.display = "none";
+    });
+  </script>
+
+  <script type="module" src="js/login.js"></script>
+
 </body>
 </html>
