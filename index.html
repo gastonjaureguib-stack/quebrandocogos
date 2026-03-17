@@ -48,12 +48,10 @@ Descargar app
 
 <script>
 if ('serviceWorker' in navigator) {
- navigator.serviceWorker.register('/quebrandocogos/service-worker.js')
+  navigator.serviceWorker.register('./service-worker.js')
     .then(() => console.log("Service Worker registrado"))
     .catch(err => console.log("Error:", err));
 }
-
-
 
 // ===== INSTALAR APP =====
 let deferredPrompt;
